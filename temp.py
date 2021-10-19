@@ -5,6 +5,8 @@ Spyder Editor
 This is a temporary script file.
 """
 
+%reset -f "clear"
+
 import pandas as pd
 
 
@@ -16,22 +18,31 @@ df = pd.ExcelFile(
 # # print(df.sheet_names)
 
 "Transformer la feuille en DataFrame"
-A=pd.read_excel(df,'Primary Energy Consumption')
+PEconso=pd.read_excel(df,'Primary Energy Consumption')
+
 "Modifier les indexes des lignes"
-A=A.set_index('Primary Energy: Consumption*')
+PEconso=PEconso.set_index('Primary Energy: Consumption*')
+
 " on transpose la matrice et on modifier les indexes des lignes"
-A=A.T
-A=A.set_index('Exajoules')
-"on remet la matrice a sa place"
-A=A.T
-"on suprimme les lignes il moins de 3 trois elements non-nan"
-A=A.dropna(thresh=3)
+PEconso=PEconso.T.set_index('Exajoules')
+
+"on supprime les lignes il moins de 3 trois elements non-nan"
+PEconso=PEconso.T.dropna(thresh=3)
 
 "remplace les nan par zero"
-A=A.fillna(0)
+PEconso=PEconso.fillna(0)
 
-"supprimer les deux dernieres colonnes"
-A = A.iloc[: ,:-2]
+"supprimer les 5 dernieres colonnes"
+PEconso = PEconso.iloc[:-3,:-5]
 
+"creer une DF des totales"
+PEconsoTT=PEconso[PEconso.index.str.contains('Total'or'OECD', regex=False)]
+# PEconso=PEconso[PEconso.index.str.contains('Total'or'OECD', regex=False)]
 
-A.T.plot(figsize=(12, 6))
+"on concatene les TT avec la dataframe de base"
+PEconso=pd.concat([PEconso,PEconsoTT])
+
+"on supprime les doublons"
+PEconso=PEconso.drop_duplicates(keep=False)
+
+# PEconso.T.plot(figsize=(12, 6))
